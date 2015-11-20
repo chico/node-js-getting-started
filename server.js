@@ -1,21 +1,19 @@
-var express = require('express');
+'use strict';
+
+var express = require('express.io');
+
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
+var config = require('./lib/config/config');
 var app = express();
+app.http().io();
 
-app.set('port', (process.env.PORT || 3000));
+require('./lib/config/express')(app);
+require('./lib/routes')(app, config);
 
-app.use(express.static(__dirname + '/public'));
-
-// views is directory for all template files
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
-
-app.get('/', function(request, response) {
-	var pjson = require('./package.json');
-  response.render('pages/index', {name:pjson.name, version:pjson.version});
+app.listen(config.port, function () {
+  console.log('Express server listening on port %d in %s mode', config.port, app.get('env'));
 });
 
-app.listen(app.get('port'), function() {
-  console.log('Node app is running on port', app.get('port'));
-});
-
+exports = module.exports = app;
 
